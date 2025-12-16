@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.book.mapper.BookMapper">
+
+    <!-- 图书VO结果映射 -->
+    <resultMap id="BookVOMap" type="com.book.vo.BookVO">
+        <id column="id" property="id"/>
+        <result column="book_name" property="bookName"/>
+        <result column="author" property="author"/>
+        <result column="publisher" property="publisher"/>
+        <result column="publish_date" property="publishDate"/>
+        <result column="pdf_path" property="pdfPath"/>
+        <result column="cover_path" property="coverPath"/>
+        <result column="description" property="description"/>
+        <result column="isbn" property="isbn"/>
+        <result column="create_time" property="createTime"/>
+    </resultMap>
+
+    <!-- 搜索图书 -->
+    <select id="searchBooks" resultMap="BookVOMap">
+        SELECT * FROM book
+        WHERE
+           book_name LIKE CONCAT('%', #{keyword}, '%')
+
+    </select>
+
+    <!-- 分页查询图书 -->
+    <select id="selectBookPage" resultMap="BookVOMap">
+        SELECT * FROM book
+        WHERE
+            <if test="keyword != null">
+                 (book_name LIKE CONCAT('%', #{keyword}, '%')
+                OR author LIKE CONCAT('%', #{keyword}, '%')
+                OR publisher LIKE CONCAT('%', #{keyword}, '%'))
+            </if>
+        ORDER BY create_time DESC
+    </select>
+
+    <!-- 查询图书详情 -->
+    <select id="selectBookDetailById" resultMap="BookVOMap">
+        SELECT * FROM book WHERE id = #{id}
+    </select>
+
+</mapper>

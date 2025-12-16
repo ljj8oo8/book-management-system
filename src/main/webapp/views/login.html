@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>用户登录 - 图书管理系统</title>
+    <script src="../assets/js/vue.global.prod.js"></script>
+    <link href="../assets/css/bootstrap.min.css" rel="stylesheet">
+    <link href="../assets/css/font-awesome.min.css" rel="stylesheet">
+    <script src="../assets/js/bootstrap.bundle.min.js"></script>
+    <script src="../assets/js/axios.min.js"></script>
+    <script src="../assets/config.js"></script>
+    <script src="../assets/js/api.js"></script>
+    <script src="../assets/js/auth.js"></script>
+    <style>
+        body {
+            background-color: #f8f9fa;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .login-card {
+            width: 100%;
+            max-width: 450px;
+            box-shadow: 0 0 20px rgba(0,0,0,0.1);
+        }
+    </style>
+</head>
+<body>
+<div id="app" class="container">
+    <div class="card login-card">
+        <div class="card-header bg-primary text-white text-center">
+            <h4 class="mb-0"><i class="fa fa-book"></i> 图书管理系统 - 登录</h4>
+        </div>
+        <div class="card-body p-4">
+            <!-- 错误提示 -->
+            <div class="alert alert-danger" v-if="errorMsg" role="alert">
+                {{ errorMsg }}
+            </div>
+
+            <!-- 登录表单 -->
+            <form @submit.prevent="handleLogin">
+                <div class="mb-3">
+                    <label for="username" class="form-label">用户名</label>
+                    <div class="input-group">
+                        <span class="input-group-text"><i class="fa fa-user"></i></span>
+                        <input type="text" class="form-control" id="username" v-model="loginForm.username"
+                               required placeholder="请输入用户名">
+                    </div>
+                </div>
+
+                <div class="mb-3">
+                    <label for="password" class="form-label">密码</label>
+                    <div class="input-group">
+                        <span class="input-group-text"><i class="fa fa-lock"></i></span>
+                        <input type="password" class="form-control" id="password" v-model="loginForm.password"
+                               required placeholder="请输入密码">
+                    </div>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label">验证码</label>
+                    <div class="row">
+                        <div class="col-7">
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="fa fa-shield"></i></span>
+                                <input type="text" class="form-control" v-model="loginForm.code"
+                                       required placeholder="请输入验证码">
+                            </div>
+                        </div>
+                        <div class="col-5">
+                            <img :src="codeImageSrc" class="img-thumbnail w-100" @click="refreshCode" alt="验证码">
+                        </div>
+                    </div>
+                </div>
+
+                <button type="submit" class="btn btn-primary w-100 mb-3" :disabled="loading">
+                    <i class="fa fa-sign-in"></i> {{ loading ? '登录中...' : '登录' }}
+                </button>
+
+                <div class="text-center">
+                    <a href="/views/user/register" class="text-primary">还没有账号？立即注册</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+
+<script>
+    const { createApp, ref, reactive, onMounted } = Vue;
+
+    createApp({
+        setup() {
+            // 响应式数据
+            const loading = ref(false);
+            const errorMsg = ref('');
+            const codeImageSrc = ref('');
+            const loginForm = reactive({
+                username: '',
+                password: '',
+                code: '',
+                codeKey: ''
+            });
+
+            // 刷新验证码
+            const refreshCode = () => {
+                axios.get(httpurl+'/login/code')
+                    .then(res => {
+                        if (res.data.code === 200) {
+                            const [imageBase64, codeKey] = res.data.data.split('|');
+                            codeImageSrc.value = 'data:image/png;base64,' + imageBase64;
+                            loginForm.codeKey = codeKey;
+                            errorMsg.value = ''; // 清空错误提示
+                        }
+                    })
+                    .catch(err => {
+                        errorMsg.value = '验证码加载失败，请重试';
+                        console.error(err);
+                    });
+            };
+
+            // 处理登录
+            const handleLogin = () => {
+                loading.value = true;
+                errorMsg.value = '';
+                window.ApiClient.post(httpurl + '/login', loginForm)
+                    .then(res => {
+                        if (res.data.code === 200) {
+                            // 存储JWT令牌
+                            AuthUtils.setToken(res.data.data);
+                            // 跳转到首页
+                            window.location.href = '/views/index.html';
+                        } else {
+                            errorMsg.value = res.data.msg;
+                            //refreshCode(); // 刷新验证码
+                        }
+                    })
+                    .catch(err => {
+                        errorMsg.value = '登录失败，请检查账号密码';
+                        console.error(err);
+                        //refreshCode();
+                    })
+                    .finally(() => {
+                        loading.value = false;
+                    });
+            };
+
+            // 页面加载时初始化验证码
+            onMounted(() => {
+                //window.AuthUtils.isIndex();
+                refreshCode();
+            });
+
+            return {
+                loading,
+                errorMsg,
+                codeImageSrc,
+                loginForm,
+                refreshCode,
+                handleLogin
+            };
+        }
+    }).mount('#app');
+</script>
+</body>
+</html>

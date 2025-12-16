@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration scan="true" scanPeriod="60 seconds">
+    <!-- 基础配置：日志输出格式 -->
+    <property name="LOG_PATTERN" value="%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{50} - %msg%n"/>
+    <!-- 日志存储路径 -->
+    <property name="LOG_PATH" value="./logs/book-system"/>
+
+    <!-- 控制台输出 -->
+    <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>${LOG_PATTERN}</pattern>
+            <charset>UTF-8</charset>
+        </encoder>
+    </appender>
+
+    <!-- 文件输出（按时间+大小分割） -->
+    <appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${LOG_PATH}/book-system.log</file>
+        <!-- 滚动策略：按天分割 + 单个文件最大100MB，保留30天 -->
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <!-- 关键修复：添加 %i 令牌，用于同一日内的大小分片 -->
+            <fileNamePattern>${LOG_PATH}/book-system.%d{yyyy-MM-dd}.%i.log</fileNamePattern>
+            <maxHistory>30</maxHistory> <!-- 保留30天日志 -->
+
+            <!-- 按大小分割的触发策略（需配合 %i 使用） -->
+            <timeBasedFileNamingAndTriggeringPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
+                <maxFileSize>100MB</maxFileSize> <!-- 单个文件最大100MB -->
+            </timeBasedFileNamingAndTriggeringPolicy>
+
+            <!-- 可选：总日志大小限制（如10GB） -->
+            <totalSizeCap>10GB</totalSizeCap>
+        </rollingPolicy>
+
+        <encoder>
+            <pattern>${LOG_PATTERN}</pattern>
+            <charset>UTF-8</charset>
+        </encoder>
+
+        <!-- 可选：禁用追加模式（默认true，追加日志） -->
+        <append>true</append>
+    </appender>
+
+    <!-- 日志级别配置 -->
+    <root level="DEBUG">
+        <appender-ref ref="CONSOLE"/>
+        <appender-ref ref="FILE"/>
+    </root>
+
+    <!-- 自定义包日志级别 -->
+    <logger name="com.book.controller" level="DEBUG" additivity="false">
+        <appender-ref ref="CONSOLE"/>
+        <appender-ref ref="FILE"/>
+    </logger>
+
+    <!-- 降低第三方库日志冗余 -->
+    <logger name="org.springframework" level="WARN"/>
+    <logger name="com.alibaba" level="WARN"/>
+    <logger name="druid" level="WARN"/>
+</configuration>

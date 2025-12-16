@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.book.mapper.UserMapper">
+
+    <!-- 用户VO结果映射（含角色信息） -->
+    <resultMap id="userMap" type="com.book.entity.User">
+        <id column="id" property="id"/>
+        <result column="username" property="username"/>
+        <result column="password" property="password"/>
+        <result column="email" property="email"/>
+        <result column="phone" property="phone"/>
+        <result column="status" property="status"/>
+        <result column="create_time" property="createTime"/>
+        <!-- 关联角色 -->
+        <association property="role" javaType="com.book.entity.Role">
+            <result column="role_name" property="roleName"/>
+            <result column="role_code" property="roleCode"/>
+        </association>
+    </resultMap>
+
+    <resultMap id="UserVOMap" type="com.book.vo.UserVO">
+        <id column="id" property="id"/>
+        <result column="username" property="username"/>
+        <result column="email" property="email"/>
+        <result column="phone" property="phone"/>
+        <result column="status" property="status"/>
+        <result column="create_time" property="createTime"/>
+        <!-- 关联角色 -->
+        <association property="role" javaType="com.book.entity.Role">
+            <result column="role_name" property="roleName"/>
+            <result column="role_code" property="roleCode"/>
+        </association>
+    </resultMap>
+
+    <!-- 根据用户名查询用户（含角色） -->
+    <select id="selectUserByUsername" resultMap="userMap">
+        SELECT u.*, r.role_name, r.role_code
+        FROM user u
+                 LEFT JOIN user_role ur on u.id=ur.user_id
+                 LEFT JOIN role r ON r.id = ur.role_id
+        WHERE u.username = #{username}
+    </select>
+
+
+    <!-- 分页查询用户 -->
+    <select id="selectUserPage" resultMap="UserVOMap">
+        SELECT u.*, r.role_name, r.role_code
+        FROM user u
+        LEFT JOIN user_role ur on u.id=ur.user_id
+        LEFT JOIN role r ON r.id = ur.role_id
+        <where>
+            <if test="username != null and username != ''">
+                u.username LIKE CONCAT('%', #{username}, '%')
+            </if>
+            <if test="status != null">
+                AND u.status = #{status}
+            </if>
+        </where>
+        ORDER BY u.create_time DESC
+    </select>
+
+    <!-- 修改用户角色 -->
+    <update id="updateUserRole">
+        UPDATE user SET role_code = #{roleCode} WHERE id = #{userId}
+    </update>
+
+    <!-- 修改用户状态 -->
+    <update id="updateUserStatus">
+        UPDATE user SET status = #{status} WHERE id = #{userId}
+    </update>
+
+</mapper>

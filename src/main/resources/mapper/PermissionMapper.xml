@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!-- 对应 PermissionMapper 接口的命名空间 -->
+<mapper namespace="com.book.mapper.PermissionMapper">
+
+    <!-- 通用查询列 -->
+    <sql id="Base_Column_List">
+        id, perm_name, perm_code
+    </sql>
+
+
+    <!-- 可选：根据用户ID查询权限（直接关联用户-角色-权限） -->
+    <select id="selectByUserId" resultType="com.book.entity.Permission">
+        SELECT
+        <include refid="Base_Column_List"/>
+        FROM permission p
+        INNER JOIN role_permission rp ON p.id = rp.permission_id
+        INNER JOIN user_role ur ON rp.role_id = ur.role_id
+        WHERE
+        ur.user_id = #{userId}
+    </select>
+
+
+</mapper>

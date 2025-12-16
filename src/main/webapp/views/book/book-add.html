@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>新增图书 - 图书管理系统</title>
+    <script src="../../assets/js/vue.global.prod.js"></script>
+    <link href="../../assets/css/bootstrap.min.css" rel="stylesheet">
+    <link href="../../assets/css/font-awesome.min.css" rel="stylesheet">
+    <script src="../../assets/js/bootstrap.bundle.min.js"></script>
+    <script src="../../assets/js/axios.min.js"></script>
+    <script src="../../assets/config.js"></script>
+    <script src="../../assets/js/api.js"></script>
+    <script src="../../assets/js/auth.js"></script>
+    <style>
+        body {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+        .content {
+            flex: 1;
+            padding: 20px 0;
+        }
+        .sidebar {
+            min-height: calc(100vh - 56px);
+            background-color: #f8f9fa;
+            padding-top: 20px;
+        }
+        .navbar-brand {
+            font-weight: bold;
+        }
+        .active-menu {
+            background-color: #0d6efd;
+            color: white !important;
+        }
+    </style>
+</head>
+<body>
+<div id="app">
+    <!-- 头部导航 -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+        <div class="container">
+            <a class="navbar-brand" href="/index">
+                <i class="fa fa-book"></i> 图书管理系统
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item" v-if="isLogin">
+                            <span class="nav-link">
+                                <i class="fa fa-user"></i> {{ username }}
+                            </span>
+                    </li>
+                    <li class="nav-item" v-if="isLogin">
+                        <a class="nav-link" href="#" @click="logout">
+                            <i class="fa fa-sign-out"></i> 退出登录
+                        </a>
+                    </li>
+                    <li class="nav-item" v-else>
+                        <a class="nav-link" href="/login">
+                            <i class="fa fa-sign-in"></i> 登录
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- 主体内容 -->
+    <div class="container-fluid">
+        <div class="row">
+            <!-- 侧边栏 -->
+            <div class="col-md-2 sidebar p-0">
+                <div class="list-group list-group-flush">
+                    <a href="/views/index.html" class="list-group-item list-group-item-action active-menu">
+                        <i class="fa fa-home"></i> 系统首页
+                    </a>
+                    <a href="/views/book/book-list.html" class="list-group-item list-group-item-action" v-if="isAdmin">
+                        <i class="fa fa-book"></i> 图书管理
+                    </a>
+                    <a href="/views/user/user-list.html" class="list-group-item list-group-item-action" v-if="isAdmin">
+                        <i class="fa fa-users"></i> 用户管理
+                    </a>
+                    <a href="/views/log/log-list.html" class="list-group-item list-group-item-action" v-if="isAdmin">
+                        <i class="fa fa-history"></i> 操作日志
+                    </a>
+                </div>
+            </div>
+            <!-- 主内容区 -->
+            <div class="col-md-10 content">
+                <div class="container">
+                    <div class="card shadow-sm mt-3">
+                        <div class="card-header bg-primary text-white">
+                            <h5 class="mb-0"><i class="fa fa-plus"></i> 新增图书</h5>
+                        </div>
+                        <div class="card-body">
+                            <!-- 提示信息 -->
+                            <div class="alert alert-danger" v-if="errorMsg" role="alert">
+                                {{ errorMsg }}
+                            </div>
+                            <div class="alert alert-success" v-if="successMsg" role="alert">
+                                {{ successMsg }}
+                            </div>
+
+                            <!-- 新增图书表单 -->
+                            <form @submit.prevent="submitBook" enctype="multipart/form-data">
+                                <div class="row mb-3">
+                                    <div class="col-md-6">
+                                        <label for="bookName" class="form-label">图书名称 <span class="text-danger">*</span></label>
+                                        <input type="text" class="form-control" id="bookName" v-model="bookForm.bookName"
+                                               required placeholder="请输入图书名称">
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label for="author" class="form-label">作者 <span class="text-danger">*</span></label>
+                                        <input type="text" class="form-control" id="author" v-model="bookForm.author"
+                                               required placeholder="请输入作者名称">
+                                    </div>
+                                </div>
+
+                                <div class="row mb-3">
+                                    <div class="col-md-6">
+                                        <label for="publisher" class="form-label">出版社 <span class="text-danger">*</span></label>
+                                        <input type="text" class="form-control" id="publisher" v-model="bookForm.publisher"
+                                               required placeholder="请输入出版社名称">
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label for="publishDate" class="form-label">出版日期 <span class="text-danger">*</span></label>
+                                        <input type="date" class="form-control" id="publishDate" v-model="bookForm.publishDate" required>
+                                    </div>
+                                </div>
+
+                                <div class="mb-6">
+                                    <label for="isbn" class="form-label">ISBN <span class="text-danger">*</span></label>
+                                    <input type="text" class="form-control" id="isbn" v-model="bookForm.isbn"
+                                           required placeholder="请输入ISNB">
+                                </div>
+
+                                <div class="mb-3">
+                                    <label for="description" class="form-label">图书描述</label>
+                                    <textarea class="form-control" id="description" v-model="bookForm.description" rows="3"
+                                              placeholder="请输入图书描述（可选）"></textarea>
+                                </div>
+
+
+
+                                <div class="mb-3">
+                                    <label for="pdfFile" class="form-label">PDF文件 <span class="text-danger">*</span></label>
+                                    <input type="file" class="form-control" id="pdfFile" ref="pdfFileRef" accept=".pdf" required>
+                                    <div class="form-text">仅支持PDF格式，文件大小不超过50MB</div>
+                                </div>
+
+                                <div class="d-flex justify-content-between">
+                                    <a href="/views/book/book-list.html" class="btn btn-outline-secondary">
+                                        <i class="fa fa-arrow-left"></i> 返回列表
+                                    </a>
+                                    <button type="submit" class="btn btn-primary" :disabled="loading">
+                                        <i class="fa fa-save"></i> {{ loading ? '保存中...' : '保存图书' }}
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    const { createApp, ref, reactive, onMounted } = Vue;
+
+    createApp({
+        setup() {
+            // 响应式数据
+            const isLogin = ref(false);
+            const isAdmin = ref(false);
+            const username = ref('');
+            const loading = ref(false);
+            const errorMsg = ref('');
+            const successMsg = ref('');
+            const pdfFileRef = ref(null);
+            const bookForm = reactive({
+                bookName: '',
+                author: '',
+                publisher: '',
+                publishDate: '',
+                description: '',
+                isbn: ''
+            });
+
+            // 退出登录
+            const logout = () => {
+                if (confirm('确定要退出登录吗？')) {
+                    window.ApiClient.post(httpurl+'/login/logout')
+                        .then(() => {
+                            window.AuthUtils.removeToken();
+                            window.location.href = '/views/login.html';
+                        })
+                        .catch(err => {
+                            console.error(err);
+                            window.AuthUtils.removeToken();
+                            window.location.href = '/views/login.html';
+                        });
+                }
+            };
+
+            // 获取当前用户信息
+            const getCurrentUser = () => {
+                window.ApiClient.get(httpurl+'/user/current')
+                    .then(res => {
+                        if (res.data.code === 200) {
+                            isLogin.value = true;
+                            username.value = res.data.data.username;
+                            isAdmin.value = res.data.data.roleCode === 'ADMIN';
+                            // 非管理员跳转到图书列表
+                            if (!isAdmin.value) {
+                                window.location.href = '/views/book/book-list.html';
+                            }
+                        }
+                    })
+                    .catch(err => {
+                        isLogin.value = false;
+                        if (err.response?.status === 401) {
+                            window.location.href = '/views/login.html';
+                        }
+                    });
+            };
+
+            // 提交图书表单
+            const submitBook = () => {
+                loading.value = true;
+                errorMsg.value = '';
+                successMsg.value = '';
+
+                const formattedDate = bookForm.publishDate ? new Date(bookForm.publishDate).toISOString().split('T')[0] : '';
+
+                // 构建FormData
+                const formData = new FormData();
+                formData.append('bookName', bookForm.bookName);
+                formData.append('author', bookForm.author);
+                formData.append('publisher', bookForm.publisher);
+                formData.append('publishDate', formattedDate);
+                formData.append('description', bookForm.description);
+                formData.append('isbn', bookForm.isbn);
+                // 添加文件
+                if (pdfFileRef.value && pdfFileRef.value.files.length > 0) {
+                    formData.append('pdfFile', pdfFileRef.value.files[0]);
+                } else {
+                    errorMsg.value = '请选择PDF文件';
+                    loading.value = false;
+                    return;
+                }
+
+                // 提交请求
+                window.ApiClient.post(httpurl+'/book/add', formData, {
+                    headers: {
+                        'Content-Type': 'multipart/form-data'
+                    }
+                })
+                    .then(res => {
+                        if (res.data.code === 200) {
+                            successMsg.value = '新增图书成功！';
+                            // 重置表单
+                            Object.assign(bookForm, {
+                                bookName: '',
+                                author: '',
+                                publisher: '',
+                                publishDate: '',
+                                description: '',
+                                isbn: ''
+                            });
+                            pdfFileRef.value.value = '';
+                            // 3秒后跳转到列表页
+                            setTimeout(() => {
+                                window.location.href = '/views/book/book-list.html';
+                            }, 1500);
+                        } else {
+                            errorMsg.value = res.data.msg;
+                        }
+                    })
+                    .catch(err => {
+                        errorMsg.value = '新增图书失败，请检查表单或重试';
+                        console.error(err);
+                    })
+                    .finally(() => {
+                        loading.value = false;
+                    });
+            };
+
+            // 页面加载初始化
+            onMounted(() => {
+                window.AuthUtils.isLogin();
+                getCurrentUser();
+            });
+
+            return {
+                isLogin,
+                isAdmin,
+                username,
+                loading,
+                errorMsg,
+                successMsg,
+                pdfFileRef,
+                bookForm,
+                logout,
+                submitBook
+            };
+        }
+    }).mount('#app');
+</script>
+</body>
+</html>
