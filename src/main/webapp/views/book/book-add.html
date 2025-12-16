@@ -60,7 +60,7 @@
                         </a>
                     </li>
                     <li class="nav-item" v-else>
-                        <a class="nav-link" href="/login">
+                        <a class="nav-link" href="/views/login.html">
                             <i class="fa fa-sign-in"></i> 登录
                         </a>
                     </li>
@@ -75,10 +75,7 @@
             <!-- 侧边栏 -->
             <div class="col-md-2 sidebar p-0">
                 <div class="list-group list-group-flush">
-                    <a href="/views/index.html" class="list-group-item list-group-item-action active-menu">
-                        <i class="fa fa-home"></i> 系统首页
-                    </a>
-                    <a href="/views/book/book-list.html" class="list-group-item list-group-item-action" v-if="isAdmin">
+                    <a href="/views/book/book-list.html" class="list-group-item list-group-item-action active-menu">
                         <i class="fa fa-book"></i> 图书管理
                     </a>
                     <a href="/views/user/user-list.html" class="list-group-item list-group-item-action" v-if="isAdmin">

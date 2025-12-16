@@ -1,0 +1,85 @@
+# 服务器配置
+server:
+  port: 8080
+  servlet:
+    encoding:
+      charset: UTF-8
+      enabled: true
+      force: true
+spring:
+  profiles:
+    active: test
+  application:
+    name: book-management-system
+  mvc:
+    pathmatch:
+      matching-strategy: ant_path_matcher
+  datasource:
+    type: com.alibaba.druid.pool.DruidDataSource
+    druid:
+      driver-class-name: org.h2.Driver
+      url: jdbc:h2:mem:bookdb;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE;MODE=MYSQL;
+      username: sa
+      password:
+      connection-init-sqls: SET NAMES utf8mb4
+      initial-size: 2
+      min-idle: 2
+      max-active: 10
+      max-wait: 60000
+      validation-query: SELECT 1
+      test-while-idle: true
+      test-on-borrow: false
+      test-on-return: false
+      # 过滤器配置
+      filters: stat,wall,slf4j
+      # 监控配置
+      web-stat-filter:
+        enabled: true
+        exclusions: "*.js,*.gif,*.jpg,*.png,*.css,*.ico,/druid/*"
+      stat-view-servlet:
+        enabled: true
+        url-pattern: /druid/*
+        login-username: admin
+        login-password: admin123
+        reset-enable: true
+  h2:
+    console:
+      enabled: true
+      path: /h2-console
+      settings:
+        web-allow-others: true
+  sql:
+    init:
+      schema-locations: classpath:sql/schema.sql
+      data-locations: classpath:sql/data.sql
+      mode: embedded
+      encoding: UTF-8
+      username: sa
+      password: ""
+  cache:
+    type: caffeine
+  security:
+    user:
+      name: admin
+      password: admin
+# MyBatis-Plus 配置
+mybatis-plus:
+  mapper-locations: classpath:mapper/**/*.xml
+  type-aliases-package: com.book.entity
+  configuration:
+    map-underscore-to-camel-case: true
+    log-impl: org.apache.ibatis.logging.slf4j.Slf4jImpl
+swagger:
+  enabled: true
+
+# 自定义配置
+jwt:
+  secret: aGVsbG93b3JsZEFwcGx5U2VjcmV0S2V5MTIzNDU2Nzg5MDEyMzQ1Njc4OTA=
+  expiration: 7200000
+
+book:
+  uploads:
+    pdf:
+      path: O:\uploads\pdf\
+    cover:
+      path: O:\uploads\pdf\cover\

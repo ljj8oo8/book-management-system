@@ -96,7 +96,7 @@ public class BookController {
      * 修改图书（仅管理员）
      */
     @ApiOperation("修改图书")
-    @PreAuthorize("hasAuthority('book:update')")
+    @PreAuthorize("hasAuthority('book:edit')")
     @PostMapping("/update")
     public Result<Boolean> updateBook(
             @ApiParam("图书信息") BookDTO bookDTO,
