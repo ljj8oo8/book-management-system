@@ -29,18 +29,8 @@ public class CommonConstant {
     public static final String FILE_SUFFIX_PNG = ".png";
     /** 文件上传最大大小（50MB） */
     public static final long FILE_MAX_SIZE = 50 * 1024 * 1024;
-    /** PDF文件MIME类型 */
-    public static final String CONTENT_TYPE_PDF = "application/pdf";
 
-    // ====================== 正则表达式常量 ======================
-    /** 手机号正则 */
-    public static final String REGEX_PHONE = "^1[3-9]\\d{9}$";
-    /** 邮箱正则 */
-    public static final String REGEX_EMAIL = "^[a-zA-Z0-9_-]+@[a-zA-Z0-9_-]+(\\.[a-zA-Z0-9_-]+)+$";
-    /** 用户名正则（字母、数字、下划线，2-20位） */
-    public static final String REGEX_USERNAME = "^\\w{2,20}$";
 
-    // ====================== 请求/响应常量 ======================
     /** 成功状态码 */
     public static final int HTTP_STATUS_SUCCESS = 200;
     /** 权限不足状态码 */
@@ -49,8 +39,6 @@ public class CommonConstant {
     public static final int HTTP_STATUS_UNAUTHORIZED = 401;
     /** 系统异常状态码 */
     public static final int HTTP_STATUS_ERROR = 500;
-    /** JSON响应类型 */
-    public static final String CONTENT_TYPE_JSON = "application/json;charset=UTF-8";
 
     // ====================== 路径常量 ======================
     /** 图书PDF上传基础路径 */

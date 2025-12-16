@@ -53,7 +53,7 @@ public class UserController {
         // 密码加密
         userDTO.setPassword(passwordEncoder.encode(userDTO.getPassword()));
         // 默认分配普通用户角色
-        userDTO.setRoleCode(RoleConstant.ROLE_USER);
+        //userDTO.setRoleCode(RoleConstant.ROLE_USER);
         // 注册用户
         boolean result = userService.register(userDTO);
         // 记录日志
