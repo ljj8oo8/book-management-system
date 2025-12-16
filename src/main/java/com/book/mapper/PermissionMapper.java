@@ -11,4 +11,6 @@ import java.util.List;
 public interface PermissionMapper extends BaseMapper<Permission> {
 
     List<Permission> selectByUserId(@Param("userId") Long userId);
+
+    List<String> selectByUserName(@Param("username") String username);
 }

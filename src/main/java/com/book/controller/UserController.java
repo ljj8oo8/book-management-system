@@ -4,6 +4,7 @@ import com.book.constant.CommonConstant;
 import com.book.constant.RoleConstant;
 import com.book.dto.UserDTO;
 import com.book.service.LogService;
+import com.book.service.PermissionService;
 import com.book.service.UserService;
 import com.book.util.Result;
 import io.swagger.annotations.Api;
@@ -11,10 +12,14 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.List;
 
 /**
  * 用户管理控制器
@@ -33,6 +38,9 @@ public class UserController {
 
     @Autowired
     private LogService logService;
+
+    @Autowired
+    private PermissionService permissionService;
 
     /**
      * 用户注册（公开接口）
@@ -107,5 +115,16 @@ public class UserController {
                 "修改用户状态：ID=" + userId + "，状态=" + status
         );
         return result ? Result.success(true) : Result.error("修改状态失败");
+    }
+    @ApiOperation("获取当前用户权限")
+    @GetMapping("/permissions")
+    public Result<List<String>> getUserPermissions() {
+        // 获取当前登录用户
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        UserDetails userDetails = (UserDetails) authentication.getPrincipal();
+
+        // 查询用户权限
+        List<String> permissions = permissionService.selectByUserName(userDetails.getUsername());
+        return Result.success(permissions);
     }
 }

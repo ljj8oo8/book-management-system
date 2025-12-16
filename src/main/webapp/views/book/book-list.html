@@ -12,6 +12,7 @@
     <script src="../../assets/config.js"></script>
     <script src="../../assets/js/api.js"></script>
     <script src="../../assets/js/auth.js"></script>
+    <script src="../../assets/js/permission.js"></script>
     <style>
         body {
             min-height: 100vh;
@@ -105,7 +106,7 @@
                         <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
                             <h5 class="mb-0"><i class="fa fa-book"></i> 图书列表</h5>
                             <div>
-                                <a href="/views/book/book-add.html" class="btn btn-light btn-sm" v-if="isAdmin">
+                                <a href="/views/book/book-add.html" class="btn btn-light btn-sm" v-if="PermissionUtils.hasPermission('book:add')">
                                     <i class="fa fa-plus"></i> 新增图书
                                 </a>
                             </div>
@@ -151,13 +152,13 @@
                                         <td>{{ formatDate(book.publishDate) }}</td>
                                         <td>{{ book.isbn }}</td>
                                         <td>
-                                            <a :href="'/views/book/book-detail.html?id=' + book.id" class="btn btn-sm btn-primary">
+                                            <a :href="'/views/book/book-detail.html?id=' + book.id" class="btn btn-sm btn-primary" v-if="PermissionUtils.hasPermission('book:view')">
                                                 <i class="fa fa-eye"></i> 查看
                                             </a>
-                                            <a :href="'/views/book/book-edit.html?id=' + book.id" class="btn btn-sm btn-warning ms-1" v-if="isAdmin">
+                                            <a :href="'/views/book/book-edit.html?id=' + book.id" class="btn btn-sm btn-warning ms-1" v-if="PermissionUtils.hasPermission('book:edit')">
                                                 <i class="fa fa-edit"></i> 编辑
                                             </a>
-                                            <button class="btn btn-sm btn-danger ms-1" v-if="isAdmin" @click="deleteBook(book.id)">
+                                            <button class="btn btn-sm btn-danger ms-1" v-if="PermissionUtils.hasPermission('book:del')" @click="deleteBook(book.id)">
                                                 <i class="fa fa-trash"></i> 删除
                                             </button>
                                         </td>
@@ -315,7 +316,8 @@
             };
 
             // 页面加载初始化
-            onMounted(() => {
+            onMounted(async () => {
+                await PermissionUtils.init();
                 window.AuthUtils.isLogin();
                 getCurrentUser();
                 const pageNum = bookList.pageNum || 1;
@@ -335,7 +337,8 @@
                 searchBooks,
                 resetSearch,
                 changePage,
-                deleteBook
+                deleteBook,
+                PermissionUtils
             };
         }
     }).mount('#app');

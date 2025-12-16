@@ -21,4 +21,9 @@ public class PermissionServiceImpl extends ServiceImpl<PermissionMapper, Permiss
         return permissionMapper.selectByUserId(userId);
     }
 
+    @Override
+    public List<String> selectByUserName(String username) {
+        return permissionMapper.selectByUserName(username);
+    }
+
 }

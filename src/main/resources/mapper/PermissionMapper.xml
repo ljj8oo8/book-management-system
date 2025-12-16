@@ -22,5 +22,14 @@
         ur.user_id = #{userId}
     </select>
 
+    <select id="selectByUserName" resultType="java.lang.String">
+        SELECT DISTINCT p.perm_code
+        FROM permission p
+                 INNER JOIN role_permission rp ON p.id = rp.permission_id
+                 INNER JOIN user_role ur ON rp.role_id = ur.role_id
+                 INNER JOIN user u ON ur.user_id = u.id
+        WHERE u.username = #{username}
+    </select>
+
 
 </mapper>
