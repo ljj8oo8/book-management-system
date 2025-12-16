@@ -71,8 +71,8 @@ CREATE TABLE IF NOT EXISTS `book` (
 
 -- 新增索引：图书名称（模糊查询）、作者、出版社、状态（高频筛选）
 CREATE INDEX idx_book_name ON `book`(`book_name`) ;
-CREATE INDEX idx_book_author ON `book`(`author`) ;
-CREATE INDEX idx_book_publisher ON `book`(`publisher`) ;
+CREATE INDEX idx_book_isbn ON `book`(`isbn`) ;
+
 
 -- ----------------------------
 -- 操作日志表：存储用户操作行为记录

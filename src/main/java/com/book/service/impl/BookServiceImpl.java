@@ -27,6 +27,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
@@ -60,6 +61,7 @@ public class BookServiceImpl extends ServiceImpl<BookMapper, Book> implements Bo
         BeanUtils.copyProperties(bookDTO, book);
         book.setPdfPath(pdfPath);
         book.setCoverPath(coverPath);
+        book.setCreateTime(new Date());
         // 4. 保存数据库
         return this.save(book);
     }
@@ -83,6 +85,7 @@ public class BookServiceImpl extends ServiceImpl<BookMapper, Book> implements Bo
             String newCoverPath = generateCoverPath(newPdfPath);
             book.setPdfPath(newPdfPath);
             book.setCoverPath(newCoverPath);
+            book.setUpdateTime(new Date());
         }
         // 更新基础信息
         BeanUtils.copyProperties(bookDTO, book, "id", "pdfPath", "coverPath");
