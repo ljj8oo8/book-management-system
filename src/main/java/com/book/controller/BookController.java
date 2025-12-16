@@ -6,6 +6,7 @@ import com.book.constant.CommonConstant;
 import com.book.constant.RoleConstant;
 import com.book.dto.BookDTO;
 import com.book.dto.LogDTO;
+import com.book.entity.Book;
 import com.book.service.BookService;
 import com.book.service.LogService;
 import com.book.util.Result;
@@ -16,13 +17,20 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.InputStreamResource;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.crypto.bcrypt.BCrypt;
 import org.springframework.util.Base64Utils;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletRequest;
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -170,6 +178,33 @@ public class BookController {
         );
         return book != null ? Result.success(book) : Result.error("图书不存在");
     }
+
+    @ApiOperation("查看PDF内容")
+    @PreAuthorize("hasAuthority('book:pdf')")
+    @GetMapping("/pdf/{id}")
+    public ResponseEntity<InputStreamResource> getPdfFile(@PathVariable Long id) throws IOException {
+
+        Book book= bookService.getById(id);
+        Path pdfPath = Paths.get(book.getPdfPath());
+        File pdfFile = pdfPath.toFile();
+
+        if (!pdfFile.exists() || !pdfFile.isFile()) {
+            return ResponseEntity.notFound().build();
+        }
+
+        InputStreamResource resource = new InputStreamResource(new FileInputStream(pdfFile));
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.add(HttpHeaders.CONTENT_DISPOSITION,
+                "inline; filename=\"" + book.getBookName() + "\""); // inline表示在线打开
+
+        return ResponseEntity.ok()
+                .headers(headers)
+                .contentLength(pdfFile.length())
+                .contentType(MediaType.APPLICATION_PDF)
+                .body(resource);
+    }
+
 
     private String img2Sting(String path){
         String base64Image="";

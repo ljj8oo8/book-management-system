@@ -18,6 +18,7 @@
             min-height: 100vh;
             display: flex;
             flex-direction: column;
+            background-color: #e9f5ff;
         }
         .content {
             flex: 1;
@@ -84,7 +85,7 @@
             <!-- 侧边栏 -->
             <div class="col-md-2 sidebar p-0">
                 <div class="list-group list-group-flush">
-                    <a href="/views/book/book-list.html" class="list-group-item list-group-item-action active-menu">
+                    <a href="/views/book/book-list.html" class="list-group-item list-group-item-action">
                         <i class="fa fa-book"></i> 图书管理
                     </a>
                     <a href="/views/user/user-list.html" class="list-group-item list-group-item-action" v-if="isAdmin">
@@ -262,10 +263,6 @@
                             isLogin.value = true;
                             username.value = res.data.data.username;
                             isAdmin.value = res.data.data.roleCode === 'ADMIN';
-                            // 非管理员跳转到图书列表
-                            if (!isAdmin.value) {
-                                window.location.href = '/views/book/book-list.html';
-                            }
                         }
                     })
                     .catch(err => {

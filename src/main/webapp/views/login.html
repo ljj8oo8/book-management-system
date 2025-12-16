@@ -13,22 +13,30 @@
     <script src="../assets/js/api.js"></script>
     <script src="../assets/js/auth.js"></script>
     <style>
+        /* 重置body默认样式并设置居中容器 */
         body {
-            background-color: #f8f9fa;
+            margin: 0;
+            padding: 0;
+            background-color: #e9f5ff; /* 更舒适的背景色 */
             min-height: 100vh;
             display: flex;
             align-items: center;
             justify-content: center;
         }
+
+        /* 登录卡片样式优化 */
         .login-card {
             width: 100%;
             max-width: 450px;
-            box-shadow: 0 0 20px rgba(0,0,0,0.1);
+            box-shadow: 0 2px 12px rgba(0, 0, 0, 0.1);
+            background-color: #fff;
+            border-radius: 8px;
+            overflow: hidden; /* 确保边角圆润效果 */
         }
     </style>
 </head>
 <body>
-<div id="app" class="container">
+<div id="app">
     <div class="card login-card">
         <div class="card-header bg-primary text-white text-center">
             <h4 class="mb-0"><i class="fa fa-book"></i> 图书管理系统 - 登录</h4>

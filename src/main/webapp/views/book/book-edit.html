@@ -12,11 +12,13 @@
     <script src="../../assets/config.js"></script>
     <script src="../../assets/js/api.js"></script>
     <script src="../../assets/js/auth.js"></script>
+    <script src="../../assets/js/permission.js"></script>
     <style>
         body {
             min-height: 100vh;
             display: flex;
             flex-direction: column;
+            background-color: #e9f5ff;
         }
         .content {
             flex: 1;
@@ -81,7 +83,7 @@
             <!-- 侧边栏 -->
             <div class="col-md-2 sidebar p-0">
                 <div class="list-group list-group-flush">
-                    <a href="/views/book/book-list.html" class="list-group-item list-group-item-action active-menu">
+                    <a href="/views/book/book-list.html" class="list-group-item list-group-item-action">
                         <i class="fa fa-book"></i> 图书管理
                     </a>
                     <a href="/views/user/user-list.html" class="list-group-item list-group-item-action" v-if="isAdmin">
@@ -165,7 +167,7 @@
                                     <a href="/views/book/book-list.html" class="btn btn-outline-secondary">
                                         <i class="fa fa-arrow-left"></i> 返回列表
                                     </a>
-                                    <button type="submit" class="btn btn-primary" :disabled="loading">
+                                    <button type="submit" class="btn btn-primary" :disabled="loading" v-if="PermissionUtils.hasPermission('book:edit')">
                                         <i class="fa fa-save"></i> {{ loading ? '保存中...' : '保存修改' }}
                                     </button>
                                 </div>
@@ -261,10 +263,7 @@
                             isLogin.value = true;
                             username.value = res.data.data.username;
                             isAdmin.value = res.data.data.roleCode === 'ADMIN';
-                            // 非管理员跳转到图书列表
-                            if (!isAdmin.value) {
-                                window.location.href = '/views/book/book-list.html';
-                            }
+
                         }
                     })
                     .catch(err => {
@@ -349,7 +348,8 @@
             };
 
             // 页面加载初始化
-            onMounted(() => {
+            onMounted(async () => {
+                await PermissionUtils.init();
                 window.AuthUtils.isLogin();
                 getCurrentUser();
                 getBookDetail();
@@ -367,7 +367,8 @@
                 bookForm,
                 getFileName,
                 logout,
-                submitEdit
+                submitEdit,
+                PermissionUtils
             };
         }
     }).mount('#app');
