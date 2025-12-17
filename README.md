@@ -109,7 +109,7 @@ java -jar target/book-management-system-1.0.jar
    - 现象：访问h2-console提示连接失败
    - 排查步骤：
      1. 检查application.yml：确保spring.h2.console.enabled=true，且无 IP 限制（spring.h2.console.settings.web-allow-others=true）
-     2. 确认 JDBC URL：jdbc:h2:mem:book_db（与配置文件中spring.datasource.url一致）
+     2. 确认 JDBC URL：jdbc:h2:mem:bookdb（与配置文件中spring.datasource.url一致）
 
 ## 待完善
  - 补充单元测试 
