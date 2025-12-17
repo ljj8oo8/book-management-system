@@ -99,7 +99,7 @@ java -jar target/book-management-system-1.0.jar
  - 现象：用户名密码正确但登录失败，控制台提示Empty encoded password
  - 排查步骤：
    1. 检查数据库user表password字段：需为 BCrypt 加密格式（以$2a$开头），非空
-   2.  确认CustomUserDetailsService中loadUserByUsername方法正确返回user.getPassword()（非 null）
+   2.  确认loadUserByUsername中getUserByUsername方法正确返回user.getPassword()（非 null）
    3.  检查用户状态：status=1为启用，status=0禁用（禁用用户会伪装成凭证错误）
 ### 2. 权限失效（管理员 / 普通用户权限不符）
    - 现象：管理员看不到用户管理页面，或普通用户能删除图书
