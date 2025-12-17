@@ -112,6 +112,7 @@ java -jar target/book-management-system-1.0.jar
      2. 确认 JDBC URL：jdbc:h2:mem:book_db（与配置文件中spring.datasource.url一致）
 
 ## 待完善
+ - 补充单元测试 
  - 通过md5摘要算法校验图书是否重复
  - 实现用户，角色，菜单的管理接口以及界面
  - 实现数据权限的管理
