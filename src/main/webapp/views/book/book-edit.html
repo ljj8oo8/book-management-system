@@ -13,6 +13,8 @@
     <script src="../../assets/js/api.js"></script>
     <script src="../../assets/js/auth.js"></script>
     <script src="../../assets/js/permission.js"></script>
+    <script src="../../assets/js/validator.js"></script>
+
     <style>
         body {
             min-height: 100vh;
@@ -319,6 +321,13 @@
                 // 添加新文件（可选）
                 if (pdfFileRef.value && pdfFileRef.value.files.length > 0) {
                     formData.append('pdfFile', pdfFileRef.value.files[0]);
+                }
+
+                const checkResult = window.validate.isbnValid(bookForm.isbn);
+                if (!checkResult.valid) {
+                    errorMsg.value = checkResult.message;
+                    loading.value = false;
+                    return;
                 }
 
                 // 提交请求
